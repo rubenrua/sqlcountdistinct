@@ -1,0 +1,9 @@
+[package]
+name = "sqlcountdistinct"
+version = "0.2.0"
+authors = ["rubenrua <rubenrua@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+mysql = "*"
+structopt = "0.2"

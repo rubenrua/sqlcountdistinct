@@ -1,0 +1,13 @@
+language: rust
+rust:
+  - stable
+services:
+  - mysql
+install:
+  - rustup component add rustfmt-preview
+  - rustup component add clippy-preview
+script:
+  - cargo fmt -- --check
+  - touch ./src/*.rs && cargo clippy
+  - cargo build
+  - cargo test
