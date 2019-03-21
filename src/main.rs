@@ -80,11 +80,55 @@ fn distinct_column_sumary(vec: Vec<(my::Value, usize)>, table_size: usize) -> St
         out.push_str(&value_str);
     }
 
-    if out.is_empty() {
+    if out == "...." {
         return "very long value".to_string();
     }
 
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::distinct_column_sumary;
+    use mysql::Value::Bytes;
+    use mysql::Value::Int;
+
+    #[test]
+    fn test_distinct_column_sumary() {
+        let zero = distinct_column_sumary(vec![], 0);
+        assert_eq!(zero, "");
+
+        let all_different = distinct_column_sumary(vec![(Int(1), 1); 10], 10);
+        assert_eq!(all_different, "all different");
+
+        let almost_all_different = distinct_column_sumary(vec![(Int(1), 2); 10], 20);
+        assert_eq!(almost_all_different, "almost all different");
+
+        let one = distinct_column_sumary(vec![(Int(1), 1)], 1);
+        assert_eq!(one, "1");
+
+        let one = distinct_column_sumary(vec![(Int(1), 2)], 2);
+        assert_eq!(one, "1: 2");
+
+        let two = distinct_column_sumary(vec![(Int(1), 1); 2], 2);
+        assert_eq!(two, "1, 1");
+
+        let two = distinct_column_sumary(vec![(Int(1), 2); 2], 4);
+        assert_eq!(two, "1: 2, 1: 2");
+
+        let key = Bytes(vec![82; 2]);
+        let long_key = Bytes(vec![82; 300]);
+        let long_three = distinct_column_sumary(vec![(key, 1), (long_key, 1)], 2);
+        assert_eq!(long_three, "'RR'....");
+
+        let key = Bytes(vec![82; 2]);
+        let long_key = Bytes(vec![82; 300]);
+        let long_three = distinct_column_sumary(vec![(key, 10), (long_key, 2)], 12);
+        assert_eq!(long_three, "'RR': 10....");
+
+        let very_long_value = distinct_column_sumary(vec![(Bytes(vec![82; 300]), 1); 2], 2);
+        assert_eq!(very_long_value, "very long value");
+    }
 }
 
 /// Execute a count_grouped_by in all rows of all tables of a database; alias, `BI` for terminal.
