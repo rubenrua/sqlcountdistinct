@@ -50,5 +50,6 @@ make release
 SEE
 ---
 
+* https://github.com/mongodb-rust/mongodb-schema-parser
 * https://github.com/dbohdan/structured-text-tools
 * https://github.com/lostutils/groupby
